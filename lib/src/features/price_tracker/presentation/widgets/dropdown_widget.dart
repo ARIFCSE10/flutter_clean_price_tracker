@@ -13,16 +13,23 @@ class PriceTrackerDropDownWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField(
-      key: ValueKey(items),
-      hint: Text(title),
-      items: items
-          .map((e) => DropdownMenuItem<String>(
-                value: e.key,
-                child: Text(e.value),
-              ))
-          .toList(),
-      onChanged: onChange,
+    if (items.isEmpty == true) {
+      return const SizedBox.shrink();
+    }
+
+    return Material(
+      child: DropdownButtonFormField<String>(
+        key: ValueKey(items),
+        hint: Text(title),
+        items: items
+            .map((e) => DropdownMenuItem<String>(
+                  key: ValueKey(e.key),
+                  value: e.key,
+                  child: Text(e.value),
+                ))
+            .toList(),
+        onChanged: onChange,
+      ),
     );
   }
 }

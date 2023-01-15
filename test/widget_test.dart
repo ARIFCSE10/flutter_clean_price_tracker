@@ -99,7 +99,8 @@ void main() {
   });
 
   group('DropDown Widget', () {
-    testWidgets('==>: No Item', (WidgetTester tester) async {
+    testWidgets('==>: No Item should show nothing',
+        (WidgetTester tester) async {
       PriceTrackerDropDownWidget widget = PriceTrackerDropDownWidget(
         items: const [],
         onChange: (value) {},
@@ -108,7 +109,77 @@ void main() {
       await tester.pumpWidget(widget);
 
       // Find circular progress indicator
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(DropdownButtonFormField<String>), findsNothing);
+    });
+    testWidgets('==>: Some Item should render DropdownButtonFormField',
+        (WidgetTester tester) async {
+      final items =
+          List.generate(5, (index) => MapEntry('Hello$index', 'World $index'));
+      Widget widget = MaterialApp(
+        home: Scaffold(
+          body: PriceTrackerDropDownWidget(
+            items: items,
+            onChange: (value) {},
+            title: '',
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(widget);
+
+      // find Hint Text
+      expect(
+          find.byType(DropdownButtonFormField<String>).first, findsOneWidget);
+    });
+    testWidgets('==>: Tap and find Item', (WidgetTester tester) async {
+      final items =
+          List.generate(5, (index) => MapEntry('Hello$index', 'World $index'));
+      Widget widget = MaterialApp(
+        home: Scaffold(
+          body: PriceTrackerDropDownWidget(
+            items: items,
+            onChange: (value) {},
+            title: 'Dropdown',
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(widget);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Dropdown').last, warnIfMissed: false);
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.tap(find.text('World 4').last, warnIfMissed: false);
+      await tester.pump(const Duration(seconds: 1));
+
+      // find Selected Item
+      expect(find.text('World 4'), findsOneWidget);
+    });
+    testWidgets('==>: Tap Item value check', (WidgetTester tester) async {
+      final items =
+          List.generate(5, (index) => MapEntry('Hello$index', 'World $index'));
+      Widget widget = MaterialApp(
+        home: Scaffold(
+          body: PriceTrackerDropDownWidget(
+            items: items,
+            onChange: (value) {
+              // check value
+              expect(value, 'Hello4');
+            },
+            title: 'Dropdown',
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(widget);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Dropdown').last, warnIfMissed: false);
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.tap(find.text('World 4').last, warnIfMissed: false);
+      await tester.pump(const Duration(seconds: 1));
     });
   });
 }
